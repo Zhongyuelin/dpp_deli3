@@ -1,0 +1,144 @@
+---
+title: "IMO Data Merging Analysis"
+author: "Zhongyue Lin"
+date: "`r Sys.Date()`"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: show
+    theme: cosmo
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+#| label: setup
+
+# Load required libraries
+library(tidyverse)
+library(curl)
+
+# Set proxy settings
+Sys.setenv(http_proxy = "http://127.0.0.1:1087")
+Sys.setenv(https_proxy = "http://127.0.0.1:1087")
+
+# Function to read IMO data
+read_imo_data <- function(file_name, integer_cols, character_cols, date_cols = c()) {
+  # Construct URL
+  url <- paste0("https://raw.githubusercontent.com/Zhongyuelin/Deliverable01-Collecting-raw-data-/main/IMO_data/", file_name)
+  
+  # Set up curl handle
+  h <- new_handle()
+  handle_setopt(h, ssl_verifypeer = FALSE)
+  temp <- tempfile()
+  
+  # Download data
+  curl_download(url, temp, handle = h)
+  
+  # Set column types
+  col_types <- cols(.default = col_double())
+  col_types$cols[integer_cols] <- map(integer_cols, ~ col_integer())
+  col_types$cols[character_cols] <- map(character_cols, ~ col_character())
+  col_types$cols[date_cols] <- map(date_cols, ~ col_date())
+  
+  # Read and return data
+  data <- read_csv(temp, col_types = col_types)
+  unlink(temp)
+  return(data)
+}
+
+# Read country results data
+country_results <- read_imo_data(
+  "country_results.csv",
+  integer_cols = c("year", "team_size_all", "team_size_male", "team_size_female",
+                   "p1", "p2", "p3", "p4", "p5", "p6",
+                   "awards_gold", "awards_silver", "awards_bronze", "awards_honorable_mentions"),
+  character_cols = c("country", "leader", "deputy_leader"))
+
+# Read individual results data
+individual_results <- read_imo_data(
+  "individual_results.csv",
+  integer_cols = c("year", "p1", "p2", "p3", "p4", "p5", "p6", "total", "individual_rank"),
+  character_cols = c("contestant", "country", "award"))
+
+# Read timeline data
+timeline <- read_imo_data(
+  "timeline.csv",
+  integer_cols = c("edition", "year", "countries", "all_contestant", 
+                   "male_contestant", "female_contestant"),
+  character_cols = c("country", "city"),
+  date_cols = c("start_date", "end_date"))
+```
+
+## Data Merging
+
+### 1. Prepare Individual Datasets
+
+```{r data-prep}
+#| label: data-prep
+
+# Prepare country performance data
+country_performance <- country_results %>%
+  group_by(year, country) %>%
+  summarise(
+    team_score = sum(p1 + p2 + p3 + p4 + p5 + p6, na.rm = TRUE),
+    total_medals = sum(awards_gold + awards_silver + awards_bronze, na.rm = TRUE),
+    team_size = team_size_all,
+    .groups = 'drop'
+  )
+
+# Prepare individual performance data
+individual_performance <- individual_results %>%
+  group_by(year, country) %>%
+  summarise(
+    avg_individual_score = mean(total, na.rm = TRUE),
+    top_rank = min(individual_rank, na.rm = TRUE),
+    num_contestants = n(),
+    .groups = 'drop'
+  )
+
+# Prepare timeline data
+timeline_summary <- timeline %>%
+  select(year, host_country = country, host_city = city, 
+         total_countries = countries, total_contestants = all_contestant)
+```
+
+### 2. Merge Datasets
+
+```{r merge-data}
+#| label: merge-data
+
+# Merge all datasets
+comprehensive_imo_data <- country_performance %>%
+  left_join(individual_performance, by = c("year", "country")) %>%
+  left_join(timeline_summary, by = "year") %>%
+  mutate(
+    is_host = country == host_country
+  ) %>%
+  arrange(year, country)
+
+# Save merged data
+dir.create("MergedData", showWarnings = FALSE)
+write_csv(comprehensive_imo_data, "MergedData/comprehensive_imo_data.csv")
+```
+
+## Results
+
+The merged dataset contains the following information:
+
+1. Team Performance Data:
+   - Year and country information
+   - Team total scores
+   - Number of medals won
+   - Team size
+
+2. Individual Performance Data:
+   - Average individual scores
+   - Best ranking
+   - Number of contestants
+
+3. Competition Context:
+   - Host country and city
+   - Total participating countries
+   - Total number of contestants
+
+This merged dataset provides a foundation for further analysis of IMO competition patterns and trends.
