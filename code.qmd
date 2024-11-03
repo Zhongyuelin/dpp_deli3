@@ -1,5 +1,6 @@
 ---
-title: "IMO Data Merging Analysis"
+title: "International Mathematical Olympiad (IMO) Data Analysis: Data Merging Process"
+subtitle: "Combining Country Results, Individual Performance, and Competition Timeline Data"
 author: "Zhongyue Lin"
 date: "`r Sys.Date()`"
 format:
@@ -8,6 +9,7 @@ format:
     toc-depth: 2
     code-fold: show
     theme: cosmo
+    output-file: "index.html"
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
@@ -47,6 +49,7 @@ read_imo_data <- function(file_name, integer_cols, character_cols, date_cols = c
 }
 
 # Read country results data
+cat("Reading country results data...\n")
 country_results <- read_imo_data(
   "country_results.csv",
   integer_cols = c("year", "team_size_all", "team_size_male", "team_size_female",
@@ -55,23 +58,29 @@ country_results <- read_imo_data(
   character_cols = c("country", "leader", "deputy_leader"))
 
 # Read individual results data
+cat("Reading individual results data...\n")
 individual_results <- read_imo_data(
   "individual_results.csv",
   integer_cols = c("year", "p1", "p2", "p3", "p4", "p5", "p6", "total", "individual_rank"),
   character_cols = c("contestant", "country", "award"))
 
 # Read timeline data
+cat("Reading timeline data...\n")
 timeline <- read_imo_data(
   "timeline.csv",
   integer_cols = c("edition", "year", "countries", "all_contestant", 
                    "male_contestant", "female_contestant"),
   character_cols = c("country", "city"),
   date_cols = c("start_date", "end_date"))
+
+cat("All datasets successfully loaded!\n")
 ```
 
-## Data Merging
+## Data Merging Process
 
 ### 1. Prepare Individual Datasets
+
+First, we prepare each dataset for merging by creating summary statistics and selecting relevant variables.
 
 ```{r data-prep}
 #| label: data-prep
@@ -104,6 +113,8 @@ timeline_summary <- timeline %>%
 
 ### 2. Merge Datasets
 
+Now we merge all prepared datasets into a comprehensive dataset.
+
 ```{r merge-data}
 #| label: merge-data
 
@@ -116,29 +127,61 @@ comprehensive_imo_data <- country_performance %>%
   ) %>%
   arrange(year, country)
 
-# Save merged data
+# Create directory and save merged data
 dir.create("MergedData", showWarnings = FALSE)
 write_csv(comprehensive_imo_data, "MergedData/comprehensive_imo_data.csv")
+
+cat("Merged data has been saved successfully!\n")
 ```
 
-## Results
+## Dataset Description
 
-The merged dataset contains the following information:
+The merged dataset combines information from three different sources and contains the following information:
 
-1. Team Performance Data:
-   - Year and country information
-   - Team total scores
-   - Number of medals won
-   - Team size
+### 1. Team Performance Data
+- Year and country identification
+- Team total scores (sum of all problem scores)
+- Number of medals won (total of gold, silver, and bronze)
+- Team size information
 
-2. Individual Performance Data:
-   - Average individual scores
-   - Best ranking
-   - Number of contestants
+### 2. Individual Performance Data
+- Average individual scores per country
+- Best ranking achieved by country
+- Number of contestants per country
 
-3. Competition Context:
-   - Host country and city
-   - Total participating countries
-   - Total number of contestants
+### 3. Competition Context
+- Host country and city information
+- Total number of participating countries
+- Total number of contestants
 
-This merged dataset provides a foundation for further analysis of IMO competition patterns and trends.
+### Dataset Structure
+
+```{r dataset-structure}
+#| label: dataset-structure
+
+# Display structure of merged dataset
+cat("Merged Dataset Structure:\n")
+str(comprehensive_imo_data)
+
+# Display first few rows
+cat("\nSample of Merged Data:\n")
+head(comprehensive_imo_data) %>%
+  knitr::kable()
+```
+
+## Conclusion
+
+This data merging process has successfully:
+
+1. Combined three distinct IMO datasets into a comprehensive dataset
+2. Preserved key performance metrics at both team and individual levels
+3. Maintained competition context information
+4. Created a structured dataset suitable for further analysis
+
+The merged dataset provides a foundation for analyzing:
+- Historical trends in IMO performance
+- Relationships between team and individual achievements
+- Host country performance patterns
+- Participation trends over time
+
+All merged data has been saved in the MergedData directory and is ready for further analysis.

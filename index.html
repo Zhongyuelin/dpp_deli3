@@ -9,7 +9,7 @@
 <meta name="author" content="Zhongyue Lin">
 <meta name="dcterms.date" content="2024-11-03">
 
-<title>IMO Data Merging Analysis</title>
+<title>International Mathematical Olympiad (IMO) Data Analysis: Data Merging Process</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -59,16 +59,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="未命名_files/libs/clipboard/clipboard.min.js"></script>
-<script src="未命名_files/libs/quarto-html/quarto.js"></script>
-<script src="未命名_files/libs/quarto-html/popper.min.js"></script>
-<script src="未命名_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="未命名_files/libs/quarto-html/anchor.min.js"></script>
-<link href="未命名_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="未命名_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="未命名_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="未命名_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="未命名_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="code_files/libs/clipboard/clipboard.min.js"></script>
+<script src="code_files/libs/quarto-html/quarto.js"></script>
+<script src="code_files/libs/quarto-html/popper.min.js"></script>
+<script src="code_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="code_files/libs/quarto-html/anchor.min.js"></script>
+<link href="code_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="code_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="code_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="code_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="code_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -81,8 +81,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#data-merging" id="toc-data-merging" class="nav-link active" data-scroll-target="#data-merging">Data Merging</a></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  <li><a href="#data-merging-process" id="toc-data-merging-process" class="nav-link active" data-scroll-target="#data-merging-process">Data Merging Process</a></li>
+  <li><a href="#dataset-description" id="toc-dataset-description" class="nav-link" data-scroll-target="#dataset-description">Dataset Description</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
 </div>
@@ -90,7 +91,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">IMO Data Merging Analysis</h1>
+<h1 class="title">International Mathematical Olympiad (IMO) Data Analysis: Data Merging Process</h1>
+<p class="subtitle lead">Combining Country Results, Individual Performance, and Competition Timeline Data</p>
 </div>
 
 
@@ -154,108 +156,331 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Read country results data</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="st">"country_results.csv"</span>,</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"team_size_all"</span>, <span class="st">"team_size_male"</span>, <span class="st">"team_size_female"</span>,</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>,</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"awards_gold"</span>, <span class="st">"awards_silver"</span>, <span class="st">"awards_bronze"</span>, <span class="st">"awards_honorable_mentions"</span>),</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"country"</span>, <span class="st">"leader"</span>, <span class="st">"deputy_leader"</span>))</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Read individual results data</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="st">"individual_results.csv"</span>,</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>, <span class="st">"total"</span>, <span class="st">"individual_rank"</span>),</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"contestant"</span>, <span class="st">"country"</span>, <span class="st">"award"</span>))</span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Read timeline data</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="st">"timeline.csv"</span>,</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"edition"</span>, <span class="st">"year"</span>, <span class="st">"countries"</span>, <span class="st">"all_contestant"</span>, </span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"male_contestant"</span>, <span class="st">"female_contestant"</span>),</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"country"</span>, <span class="st">"city"</span>),</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">date_cols =</span> <span class="fu">c</span>(<span class="st">"start_date"</span>, <span class="st">"end_date"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reading country results data...</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading country results data...</code></pre>
 </div>
-<section id="data-merging" class="level2">
-<h2 class="anchored" data-anchor-id="data-merging">Data Merging</h2>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"country_results.csv"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"team_size_all"</span>, <span class="st">"team_size_male"</span>, <span class="st">"team_size_female"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"awards_gold"</span>, <span class="st">"awards_silver"</span>, <span class="st">"awards_bronze"</span>, <span class="st">"awards_honorable_mentions"</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"country"</span>, <span class="st">"leader"</span>, <span class="st">"deputy_leader"</span>))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Read individual results data</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reading individual results data...</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading individual results data...</code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"individual_results.csv"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>, <span class="st">"total"</span>, <span class="st">"individual_rank"</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"contestant"</span>, <span class="st">"country"</span>, <span class="st">"award"</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Read timeline data</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reading timeline data...</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading timeline data...</code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"timeline.csv"</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"edition"</span>, <span class="st">"year"</span>, <span class="st">"countries"</span>, <span class="st">"all_contestant"</span>, </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"male_contestant"</span>, <span class="st">"female_contestant"</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"country"</span>, <span class="st">"city"</span>),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">date_cols =</span> <span class="fu">c</span>(<span class="st">"start_date"</span>, <span class="st">"end_date"</span>))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"All datasets successfully loaded!</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>All datasets successfully loaded!</code></pre>
+</div>
+</div>
+<section id="data-merging-process" class="level2">
+<h2 class="anchored" data-anchor-id="data-merging-process">Data Merging Process</h2>
 <section id="prepare-individual-datasets" class="level3">
 <h3 class="anchored" data-anchor-id="prepare-individual-datasets">1. Prepare Individual Datasets</h3>
+<p>First, we prepare each dataset for merging by creating summary statistics and selecting relevant variables.</p>
 <div class="cell">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare country performance data</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>country_performance <span class="ot">&lt;-</span> country_results <span class="sc">%&gt;%</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, country) <span class="sc">%&gt;%</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">team_score =</span> <span class="fu">sum</span>(p1 <span class="sc">+</span> p2 <span class="sc">+</span> p3 <span class="sc">+</span> p4 <span class="sc">+</span> p5 <span class="sc">+</span> p6, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_medals =</span> <span class="fu">sum</span>(awards_gold <span class="sc">+</span> awards_silver <span class="sc">+</span> awards_bronze, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">team_size =</span> team_size_all,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">'drop'</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare individual performance data</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>individual_performance <span class="ot">&lt;-</span> individual_results <span class="sc">%&gt;%</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, country) <span class="sc">%&gt;%</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_individual_score =</span> <span class="fu">mean</span>(total, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">top_rank =</span> <span class="fu">min</span>(individual_rank, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_contestants =</span> <span class="fu">n</span>(),</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">'drop'</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare timeline data</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>timeline_summary <span class="ot">&lt;-</span> timeline <span class="sc">%&gt;%</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, <span class="at">host_country =</span> country, <span class="at">host_city =</span> city, </span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">total_countries =</span> countries, <span class="at">total_contestants =</span> all_contestant)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare country performance data</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>country_performance <span class="ot">&lt;-</span> country_results <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, country) <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">team_score =</span> <span class="fu">sum</span>(p1 <span class="sc">+</span> p2 <span class="sc">+</span> p3 <span class="sc">+</span> p4 <span class="sc">+</span> p5 <span class="sc">+</span> p6, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_medals =</span> <span class="fu">sum</span>(awards_gold <span class="sc">+</span> awards_silver <span class="sc">+</span> awards_bronze, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">team_size =</span> team_size_all,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">'drop'</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare individual performance data</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>individual_performance <span class="ot">&lt;-</span> individual_results <span class="sc">%&gt;%</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, country) <span class="sc">%&gt;%</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_individual_score =</span> <span class="fu">mean</span>(total, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">top_rank =</span> <span class="fu">min</span>(individual_rank, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_contestants =</span> <span class="fu">n</span>(),</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">'drop'</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare timeline data</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>timeline_summary <span class="ot">&lt;-</span> timeline <span class="sc">%&gt;%</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, <span class="at">host_country =</span> country, <span class="at">host_city =</span> city, </span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">total_countries =</span> countries, <span class="at">total_contestants =</span> all_contestant)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
 <section id="merge-datasets" class="level3">
 <h3 class="anchored" data-anchor-id="merge-datasets">2. Merge Datasets</h3>
+<p>Now we merge all prepared datasets into a comprehensive dataset.</p>
 <div class="cell">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge all datasets</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>comprehensive_imo_data <span class="ot">&lt;-</span> country_performance <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(individual_performance, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"country"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(timeline_summary, <span class="at">by =</span> <span class="st">"year"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_host =</span> country <span class="sc">==</span> host_country</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year, country)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Save merged data</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"MergedData"</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(comprehensive_imo_data, <span class="st">"MergedData/comprehensive_imo_data.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge all datasets</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>comprehensive_imo_data <span class="ot">&lt;-</span> country_performance <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(individual_performance, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"country"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(timeline_summary, <span class="at">by =</span> <span class="st">"year"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_host =</span> country <span class="sc">==</span> host_country</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year, country)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Create directory and save merged data</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"MergedData"</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(comprehensive_imo_data, <span class="st">"MergedData/comprehensive_imo_data.csv"</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Merged data has been saved successfully!</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Merged data has been saved successfully!</code></pre>
+</div>
 </div>
 </section>
 </section>
-<section id="results" class="level2">
-<h2 class="anchored" data-anchor-id="results">Results</h2>
-<p>The merged dataset contains the following information:</p>
-<ol type="1">
-<li>Team Performance Data:
+<section id="dataset-description" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-description">Dataset Description</h2>
+<p>The merged dataset combines information from three different sources and contains the following information:</p>
+<section id="team-performance-data" class="level3">
+<h3 class="anchored" data-anchor-id="team-performance-data">1. Team Performance Data</h3>
 <ul>
-<li>Year and country information</li>
-<li>Team total scores</li>
-<li>Number of medals won</li>
-<li>Team size</li>
-</ul></li>
-<li>Individual Performance Data:
+<li>Year and country identification</li>
+<li>Team total scores (sum of all problem scores)</li>
+<li>Number of medals won (total of gold, silver, and bronze)</li>
+<li>Team size information</li>
+</ul>
+</section>
+<section id="individual-performance-data" class="level3">
+<h3 class="anchored" data-anchor-id="individual-performance-data">2. Individual Performance Data</h3>
 <ul>
-<li>Average individual scores</li>
-<li>Best ranking</li>
-<li>Number of contestants</li>
-</ul></li>
-<li>Competition Context:
+<li>Average individual scores per country</li>
+<li>Best ranking achieved by country</li>
+<li>Number of contestants per country</li>
+</ul>
+</section>
+<section id="competition-context" class="level3">
+<h3 class="anchored" data-anchor-id="competition-context">3. Competition Context</h3>
 <ul>
-<li>Host country and city</li>
-<li>Total participating countries</li>
+<li>Host country and city information</li>
+<li>Total number of participating countries</li>
 <li>Total number of contestants</li>
-</ul></li>
+</ul>
+</section>
+<section id="dataset-structure" class="level3">
+<h3 class="anchored" data-anchor-id="dataset-structure">Dataset Structure</h3>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Display structure of merged dataset</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Merged Dataset Structure:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Merged Dataset Structure:</code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(comprehensive_imo_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [7,020 × 13] (S3: tbl_df/tbl/data.frame)
+ $ year                : int [1:7020] 1959 1959 1959 1959 1959 1959 1959 1959 1959 1959 ...
+ $ country             : chr [1:7020] "Albania" "Algeria" "Argentina" "Armenia" ...
+ $ team_score          : int [1:7020] 51 86 90 113 113 127 64 83 165 80 ...
+ $ total_medals        : int [1:7020] 1 1 4 5 4 5 1 2 6 3 ...
+ $ team_size           : int [1:7020] 6 6 6 6 6 6 6 6 6 6 ...
+ $ avg_individual_score: num [1:7020] 8.5 14.3 15 18.8 18.8 ...
+ $ top_rank            : int [1:7020] 252 47 82 182 29 90 252 216 11 147 ...
+ $ num_contestants     : int [1:7020] 6 6 6 6 6 6 6 6 6 6 ...
+ $ host_country        : chr [1:7020] "Romania" "Romania" "Romania" "Romania" ...
+ $ host_city           : chr [1:7020] "Braşov" "Braşov" "Braşov" "Braşov" ...
+ $ total_countries     : int [1:7020] 7 7 7 7 7 7 7 7 7 7 ...
+ $ total_contestants   : int [1:7020] 52 52 52 52 52 52 52 52 52 52 ...
+ $ is_host             : logi [1:7020] FALSE FALSE FALSE FALSE FALSE FALSE ...</code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Display first few rows</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Sample of Merged Data:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Sample of Merged Data:</code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(comprehensive_imo_data) <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 3%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 8%">
+<col style="width: 6%">
+<col style="width: 13%">
+<col style="width: 5%">
+<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 6%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">year</th>
+<th style="text-align: left;">country</th>
+<th style="text-align: right;">team_score</th>
+<th style="text-align: right;">total_medals</th>
+<th style="text-align: right;">team_size</th>
+<th style="text-align: right;">avg_individual_score</th>
+<th style="text-align: right;">top_rank</th>
+<th style="text-align: right;">num_contestants</th>
+<th style="text-align: left;">host_country</th>
+<th style="text-align: left;">host_city</th>
+<th style="text-align: right;">total_countries</th>
+<th style="text-align: right;">total_contestants</th>
+<th style="text-align: left;">is_host</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1959</td>
+<td style="text-align: left;">Albania</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">8.50000</td>
+<td style="text-align: right;">252</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Romania</td>
+<td style="text-align: left;">Braşov</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1959</td>
+<td style="text-align: left;">Algeria</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">14.33333</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Romania</td>
+<td style="text-align: left;">Braşov</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1959</td>
+<td style="text-align: left;">Argentina</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">15.00000</td>
+<td style="text-align: right;">82</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Romania</td>
+<td style="text-align: left;">Braşov</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1959</td>
+<td style="text-align: left;">Armenia</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">18.83333</td>
+<td style="text-align: right;">182</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Romania</td>
+<td style="text-align: left;">Braşov</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1959</td>
+<td style="text-align: left;">Australia</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">18.83333</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Romania</td>
+<td style="text-align: left;">Braşov</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1959</td>
+<td style="text-align: left;">Austria</td>
+<td style="text-align: right;">127</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">21.16667</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">Romania</td>
+<td style="text-align: left;">Braşov</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>This data merging process has successfully:</p>
+<ol type="1">
+<li>Combined three distinct IMO datasets into a comprehensive dataset</li>
+<li>Preserved key performance metrics at both team and individual levels</li>
+<li>Maintained competition context information</li>
+<li>Created a structured dataset suitable for further analysis</li>
 </ol>
-<p>This merged dataset provides a foundation for further analysis of IMO competition patterns and trends.</p>
+<p>The merged dataset provides a foundation for analyzing: - Historical trends in IMO performance - Relationships between team and individual achievements - Host country performance patterns - Participation trends over time</p>
+<p>All merged data has been saved in the MergedData directory and is ready for further analysis.</p>
 </section>
 
 </main>
