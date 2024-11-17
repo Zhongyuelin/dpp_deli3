@@ -5,14 +5,19 @@
 This repository contains the merged data for the International Mathematical Olympiad (IMO) Data Analysis project, building upon the cleaned data from Deliverable02-Cleaning-and-formatting.
 
 ## Project Overview
+
 This project focuses on merging multiple IMO datasets to create a comprehensive dataset for analysis. We combine country results, individual performance data, and competition timeline information to create a unified dataset that enables deeper analysis of IMO trends and patterns.
 
 ## Data Files
+
 The merged data is located in the `MergedData` folder within this repository. It consists of:
+
 1. `comprehensive_imo_data.csv`: A comprehensive dataset combining country results, individual results, and timeline information.
 
 ## Data Merging Process
-The data merging process is documented in detail in the `imo_data_merge.Rmd` R Markdown document. This process includes:
+
+The data merging process is documented in detail in the `IMO_Data_Merging_Process.Rmd` R Markdown document. This process includes:
+
 1. Loading cleaned datasets from previous deliverable
 2. Preparing individual datasets for merging
    - Summarizing country performance metrics
@@ -23,31 +28,39 @@ The data merging process is documented in detail in the `imo_data_merge.Rmd` R M
 5. Saving the comprehensive dataset
 
 ## Repository Structure
+
 * `MergedData/`: Contains the merged dataset
-* `imo_data_merge.Rmd`: R Markdown document detailing the merging process
-* `imo_data_merge.html`: Rendered HTML report of the merging process
+* `IMO_Data_Merging_Process.Rmd`: R Markdown document detailing the merging process
+* `index.html`: Rendered HTML report of the merging process
 
 ## How to Use
+
 1. Clone this repository to your local machine
-2. Open and run the `imo_data_merge.Rmd` file to see the detailed merging process
+2. Open and run the `IMO_Data_Merging_Process.Rmd` file to see the detailed merging process
 3. The merged data file in the `MergedData/` folder is ready for analysis
 
 ## Code Visualization
-The data merging code can be viewed here: [IMO Data Merging Analysis](link-to-your-html-report)
+
+The data merging code can be viewed here: [IMO Data Merging Analysis](https://zhongyuelin.github.io/dpp_deli3/)
 
 ## Dependencies
+
 * R (version 4.0.0 or higher)
 * tidyverse
 * curl
 
 ## Original Data Source
+
 The original data was obtained from the TidyTuesday project, week 39 dataset of 2024. It comes from the International Mathematical Olympiad official records, scraped from https://www.imo-official.org/.
 
 ## Data Range
+
 The dataset covers IMO events from 1959 to 2024.
 
 ## Merged Dataset Contents
+
 The comprehensive dataset includes:
+
 1. Team Performance Metrics:
    - Team total scores
    - Medal counts
@@ -64,7 +77,9 @@ The comprehensive dataset includes:
    - Total contestant numbers
 
 ## Next Steps
+
 This merged dataset enables various analyses, including:
+
 * Analyzing relationships between team and individual performance
 * Studying host country performance advantages
 * Investigating participation trends over time
@@ -72,5 +87,5 @@ This merged dataset enables various analyses, including:
 * Analyzing geographical patterns in IMO success
 
 ## Contact
-For any questions or feedback regarding this data merging process, please open an issue in this repository.
 
+For any questions or feedback regarding this data merging process, please open an issue in this repository.
