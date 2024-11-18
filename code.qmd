@@ -8,6 +8,7 @@ format:
     toc: true
     code-fold: show
     theme: cosmo
+    output-file: "index.html"
 ---
 
 ```{r setup}
@@ -147,8 +148,6 @@ dir.create("MergedData", showWarnings = FALSE)
 # Save merged data
 write_csv(merged_data, "MergedData/merged_imo_data.csv")
 ```
-
-## Response to Professor's Query
 The analysis confirms that the country names in our dataset are already standardized:
 
 1. No Historical Name Changes Detected
