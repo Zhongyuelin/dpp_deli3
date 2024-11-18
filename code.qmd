@@ -1,6 +1,6 @@
 ---
 title: "International Mathematical Olympiad (IMO) Data Analysis: Data Merging Process"
-subtitle: "Combining Country Results, Individual Performance, and Competition Timeline Data"
+subtitle: "Combining Country Results, Individual Performance, and Competition Timeline Data with Historical Country Name Handling"
 author: "Zhongyue Lin"
 date: "`r Sys.Date()`"
 format:
@@ -19,7 +19,7 @@ format:
 library(tidyverse)
 library(curl)
 
-# Set proxy settings
+# Set proxy settings if needed
 Sys.setenv(http_proxy = "http://127.0.0.1:1087")
 Sys.setenv(https_proxy = "http://127.0.0.1:1087")
 
@@ -48,7 +48,7 @@ read_imo_data <- function(file_name, integer_cols, character_cols, date_cols = c
   return(data)
 }
 
-# Read country results data
+# Read datasets
 cat("Reading country results data...\n")
 country_results <- read_imo_data(
   "country_results.csv",
@@ -57,37 +57,111 @@ country_results <- read_imo_data(
                    "awards_gold", "awards_silver", "awards_bronze", "awards_honorable_mentions"),
   character_cols = c("country", "leader", "deputy_leader"))
 
-# Read individual results data
 cat("Reading individual results data...\n")
 individual_results <- read_imo_data(
   "individual_results.csv",
   integer_cols = c("year", "p1", "p2", "p3", "p4", "p5", "p6", "total", "individual_rank"),
   character_cols = c("contestant", "country", "award"))
 
-# Read timeline data
 cat("Reading timeline data...\n")
 timeline <- read_imo_data(
   "timeline.csv",
-  integer_cols = c("edition", "year", "countries", "all_contestant", 
-                   "male_contestant", "female_contestant"),
+  integer_cols = c("edition", "year", "countries", "all_contestant",
+                    "male_contestant", "female_contestant"),
   character_cols = c("country", "city"),
   date_cols = c("start_date", "end_date"))
 
 cat("All datasets successfully loaded!\n")
 ```
 
-## Data Merging Process
+## Country Name Analysis
 
-### 1. Prepare Individual Datasets
+Before merging the datasets, we need to analyze and standardize country names to account for historical changes.
 
-First, we prepare each dataset for merging by creating summary statistics and selecting relevant variables.
+```{r country-analysis}
+#| label: country-analysis
+
+# Function to analyze country patterns
+analyze_country_patterns <- function(data, dataset_name) {
+  patterns <- data %>%
+    group_by(country) %>%
+    summarize(
+      first_year = min(year),
+      last_year = max(year),
+      total_years = n_distinct(year),
+      .groups = 'drop'
+    ) %>%
+    arrange(country)
+  
+  cat(sprintf("\nAnalysis for %s:\n", dataset_name))
+  cat("Number of unique countries:", nrow(patterns), "\n")
+  return(patterns)
+}
+
+# Analyze each dataset
+country_patterns <- analyze_country_patterns(country_results, "Country Results")
+individual_patterns <- analyze_country_patterns(individual_results, "Individual Results")
+timeline_patterns <- analyze_country_patterns(timeline, "Timeline")
+
+# Create country name standardization mapping
+country_name_mapping <- tribble(
+  ~original_name,                    ~standardized_name,  ~start_year, ~end_year,
+  "German Democratic Republic",      "Germany",          1959,        1990,
+  "Federal Republic of Germany",     "Germany",          1959,        1990,
+  "Germany",                         "Germany",          1991,        2024,
+  "USSR",                           "Russia",           1959,        1991,
+  "Soviet Union",                   "Russia",           1959,        1991,
+  "Russia",                         "Russia",           1992,        2024,
+  "Czechoslovakia",                 "Czech Republic",    1959,        1992,
+  "Czech Republic",                 "Czech Republic",    1993,        2024,
+  "Yugoslavia",                     "Serbia",           1959,        1992,
+  "Serbia and Montenegro",          "Serbia",           1993,        2006,
+  "Serbia",                         "Serbia",           2007,        2024
+  # Add more mappings as needed
+)
+
+# Function to standardize country names
+standardize_country_names <- function(data) {
+  data %>%
+    left_join(country_name_mapping, by = c("country" = "original_name")) %>%
+    mutate(
+      historical_name = country,
+      country = ifelse(!is.na(standardized_name) & 
+                      year >= start_year & 
+                      year <= end_year,
+                      standardized_name, country)
+    ) %>%
+    select(-standardized_name, -start_year, -end_year)
+}
+
+# Apply standardization to all datasets
+country_results_std <- standardize_country_names(country_results)
+individual_results_std <- standardize_country_names(individual_results)
+timeline_std <- standardize_country_names(timeline)
+
+# Validate standardization
+validate_standardization <- function(original_data, standardized_data, dataset_name) {
+  cat(sprintf("\nValidation for %s:\n", dataset_name))
+  cat("Original unique countries:", n_distinct(original_data$country), "\n")
+  cat("Standardized unique countries:", n_distinct(standardized_data$country), "\n")
+  cat("Records with historical names:", sum(!is.na(standardized_data$historical_name)), "\n")
+}
+
+validate_standardization(country_results, country_results_std, "Country Results")
+validate_standardization(individual_results, individual_results_std, "Individual Results")
+validate_standardization(timeline, timeline_std, "Timeline")
+```
+
+## Data Preparation
+
+Now we prepare each standardized dataset for merging.
 
 ```{r data-prep}
 #| label: data-prep
 
 # Prepare country performance data
-country_performance <- country_results %>%
-  group_by(year, country) %>%
+country_performance <- country_results_std %>%
+  group_by(year, country, historical_name) %>%
   summarise(
     team_score = sum(p1 + p2 + p3 + p4 + p5 + p6, na.rm = TRUE),
     total_medals = sum(awards_gold + awards_silver + awards_bronze, na.rm = TRUE),
@@ -96,8 +170,8 @@ country_performance <- country_results %>%
   )
 
 # Prepare individual performance data
-individual_performance <- individual_results %>%
-  group_by(year, country) %>%
+individual_performance <- individual_results_std %>%
+  group_by(year, country, historical_name) %>%
   summarise(
     avg_individual_score = mean(total, na.rm = TRUE),
     top_rank = min(individual_rank, na.rm = TRUE),
@@ -106,50 +180,71 @@ individual_performance <- individual_results %>%
   )
 
 # Prepare timeline data
-timeline_summary <- timeline %>%
-  select(year, host_country = country, host_city = city, 
-         total_countries = countries, total_contestants = all_contestant)
+timeline_summary <- timeline_std %>%
+  select(year, host_country = country, 
+         historical_host_name = historical_name,
+         host_city = city,
+         total_countries = countries, 
+         total_contestants = all_contestant)
 ```
 
-### 2. Merge Datasets
+## Data Merging
 
-Now we merge all prepared datasets into a comprehensive dataset.
+Now we merge the prepared datasets with standardized country names.
 
 ```{r merge-data}
 #| label: merge-data
 
 # Merge all datasets
 comprehensive_imo_data <- country_performance %>%
-  left_join(individual_performance, by = c("year", "country")) %>%
+  inner_join(individual_performance, 
+            by = c("year", "country", "historical_name")) %>%
   left_join(timeline_summary, by = "year") %>%
   mutate(
-    is_host = country == host_country
+    is_host = country == host_country,
+    political_period = case_when(
+      year <= 1990 ~ "Cold War Era",
+      year <= 1992 ~ "Transition Period",
+      TRUE ~ "Modern Era"
+    )
   ) %>%
   arrange(year, country)
+
+# Validate the merge
+cat("\nMerge Validation:\n")
+cat("Number of countries in final dataset:", n_distinct(comprehensive_imo_data$country), "\n")
+cat("Number of historical names in final dataset:", 
+    n_distinct(comprehensive_imo_data$historical_name), "\n")
+cat("Year range:", min(comprehensive_imo_data$year), "to", 
+    max(comprehensive_imo_data$year), "\n")
 
 # Create directory and save merged data
 dir.create("MergedData", showWarnings = FALSE)
 write_csv(comprehensive_imo_data, "MergedData/comprehensive_imo_data.csv")
-
-cat("Merged data has been saved successfully!\n")
+cat("\nMerged data has been saved successfully!\n")
 ```
 
 ## Dataset Description
 
 The merged dataset combines information from three different sources and contains the following information:
 
-### 1. Team Performance Data
+### 1. Country Information
+- Modern country name
+- Historical country name (if different)
+- Political period classification
+
+### 2. Team Performance Data
 - Year and country identification
-- Team total scores (sum of all problem scores)
-- Number of medals won (total of gold, silver, and bronze)
+- Team total scores
+- Number of medals won
 - Team size information
 
-### 2. Individual Performance Data
+### 3. Individual Performance Data
 - Average individual scores per country
 - Best ranking achieved by country
 - Number of contestants per country
 
-### 3. Competition Context
+### 4. Competition Context
 - Host country and city information
 - Total number of participating countries
 - Total number of contestants
@@ -166,22 +261,59 @@ str(comprehensive_imo_data)
 # Display first few rows
 cat("\nSample of Merged Data:\n")
 head(comprehensive_imo_data) %>%
+  select(year, country, historical_name, team_score, total_medals, 
+         avg_individual_score, is_host, political_period) %>%
   knitr::kable()
+```
+
+## Historical Analysis
+
+Let's examine how country participation has changed over different political periods.
+
+```{r historical-analysis}
+#| label: historical-analysis
+
+# Analyze country participation across periods
+period_analysis <- comprehensive_imo_data %>%
+  group_by(political_period) %>%
+  summarise(
+    unique_countries = n_distinct(country),
+    unique_historical_names = n_distinct(historical_name),
+    avg_participants = mean(total_contestants),
+    .groups = 'drop'
+  )
+
+# Display period analysis
+cat("\nParticipation Analysis by Political Period:\n")
+print(period_analysis)
+
+# Check for countries that changed names
+name_changes <- comprehensive_imo_data %>%
+  filter(country != historical_name) %>%
+  select(year, country, historical_name) %>%
+  distinct() %>%
+  arrange(year, country)
+
+cat("\nCountries with Name Changes:\n")
+print(name_changes)
 ```
 
 ## Conclusion
 
-This data merging process has successfully:
+This revised data merging process has successfully:
 
-1. Combined three distinct IMO datasets into a comprehensive dataset
-2. Preserved key performance metrics at both team and individual levels
-3. Maintained competition context information
-4. Created a structured dataset suitable for further analysis
+1. Identified and standardized historical country names
+2. Preserved both modern and historical country identifications
+3. Tracked political periods and their impact on participation
+4. Maintained data integrity through proper validation
+5. Created a comprehensive dataset suitable for historical analysis
 
 The merged dataset provides a foundation for analyzing:
 - Historical trends in IMO performance
+- Impact of political changes on participation
 - Relationships between team and individual achievements
 - Host country performance patterns
-- Participation trends over time
+- Participation trends across different political eras
 
 All merged data has been saved in the MergedData directory and is ready for further analysis.
+
